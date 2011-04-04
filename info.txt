@@ -1,0 +1,3 @@
+pluginname: iDeal
+creator: To Wonder Multimedia
+settingspath: ideal/settings
