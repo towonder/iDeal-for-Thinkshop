@@ -272,7 +272,7 @@ class BankController extends IdealAppController {
 						$this->Email->to = CONTACT_EMAIL;
 						//$this->Email->to = 'luc.princen@gmail.com';
 						$this->Email->sendAs = 'both';
-						$this->Email->from = 'noreply@trixenrees.nl';
+						$this->Email->from = 'noreply@'.strtolower(WEBSITE_TITLE).'.nl';
 			        	$this->Email->subject = 'Een nieuwe bestelling'; 
 						$this->Email->send();
 						$this->Email->reset();
@@ -280,7 +280,7 @@ class BankController extends IdealAppController {
 						$this->Email->template = 'buyer';
 						$this->Email->to = $order['User']['email'];
 						$this->Email->sendAs = 'both';
-						$this->Email->from = 'noreply@trixenrees.nl';
+						$this->Email->from = 'noreply@'.strtolower(WEBSITE_TITLE).'.nl';
 						$this->Email->subject = 'Bedankt voor uw bestelling';
 						$this->Email->send();	
 						
