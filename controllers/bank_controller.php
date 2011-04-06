@@ -1,23 +1,5 @@
 <?php
 
-/*
-
- * Ideal for Thinkshop (plugin)
- * Copyright 2011, To Wonder Multimedia
- *	
- *
- * Licensed under The MIT License
- * Redistributions of files must retain the above copyright notice.
- *
- * @filesource
- * @copyright		To Wonder Multimedia
- * @link			http://www.getthinkshop.com Thinkshop Project
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
- * @version			1.0 Stable
-
-*/
-
-
 class BankController extends IdealAppController {
 
 	var $name = 'Bank';
@@ -40,9 +22,11 @@ class BankController extends IdealAppController {
 		
 		$this->checkEmptyCart();
 		
+		//app::import('Vendor','ideal',array('file'=>'ideal'.DS.'iDEALConnector.php'));	
 		$iDEALConnector = new iDEALConnector();
 		
 		$response = $iDEALConnector->GetIssuerList();		
+		//$this->pa($response);
 			
 		if($response->IsResponseError()){
 			$errorMsg = $response->getErrorCode();
@@ -205,7 +189,6 @@ class BankController extends IdealAppController {
 				$consumerMessage = $errorMsg;
 				$type = 4;
 				
-				//Header('Location: '.HOME.'/ideal/responseError/'.$errorCode.'/'.$errorMsg.'/'.$consumerMessage.'/'.$type);					
 				Header('Location: '.HOME.'/ideal/nopayment');
 				exit();
 			}
@@ -213,13 +196,12 @@ class BankController extends IdealAppController {
 	}
 	
 	function nopayment(){
-		
 	}
 	
 	
 	
 	function responseError($code, $msg, $consumerMessage, $type =null){
-		//ladie-da.
+		//ladie-da.		
 		$this->set('code', $code);
 		$this->set('msg', $msg);
 		$this->set('type', $type);
@@ -234,15 +216,17 @@ class BankController extends IdealAppController {
 		
 	}
 	
-	
-	//	Use cronjobs to auto-check any open payments:
-	// >> */10 * * * * curl -o --url /dev/null [[YOUR URL]]/ideal/autoCheck
-	
 	function autoCheck(){
-		$this->layout = '';
+		$this->disableCache();
+		//disableCache();
+		$this->layout = "";
+		clearCache();	
+
 		$error = '';
 		$now = date('Y-m-d H:i:s', strtotime('-10 minutes', time()));
+		$this->pa($now);
 		$orders = $this->Order->find('all', array('conditions' => array('Order.paid' => '0', 'Order.created >=' => $now, 'Order.method'=> 'ideal')));
+		$this->pa($orders);
 		$iDEALConnector = new iDEALConnector();
 		
 		if(!empty($orders)){
@@ -270,7 +254,6 @@ class BankController extends IdealAppController {
 
 						$this->Email->template = 'seller';
 						$this->Email->to = CONTACT_EMAIL;
-						//$this->Email->to = 'luc.princen@gmail.com';
 						$this->Email->sendAs = 'both';
 						$this->Email->from = 'noreply@'.strtolower(WEBSITE_TITLE).'.nl';
 			        	$this->Email->subject = 'Een nieuwe bestelling'; 
@@ -322,10 +305,10 @@ class BankController extends IdealAppController {
 					
 					$op = $this->OrdersProducts->find('all', array('conditions' => array('OrdersProducts.order_id' => $order['Order']['id'])));
 					foreach($op as $p){
-						$this->OrdersProducts->delete($p['OrdersProducts']['id']);
+						$this->OrdersProducts->del($p['OrdersProducts']['id']);
 					}
 					
-					$this->Order->delete($order['Order']['id']);
+					$this->Order->del($order['Order']['id']);
 					$error .= ', no order';
 				}	
 				
@@ -341,10 +324,10 @@ class BankController extends IdealAppController {
 					
 					$op = $this->OrdersProducts->find('all', array('conditions' => array('OrdersProducts.order_id' => $order['Order']['id'])));
 					foreach($op as $p){
-						$this->OrdersProducts->delete($p['OrdersProducts']['id']);
+						$this->OrdersProducts->del($p['OrdersProducts']['id']);
 					}
 					
-					$this->Order->delete($order['Order']['id']);
+					$this->Order->del($order['Order']['id']);
 					$error .= ', no order';
 				endif;		
 			}
